@@ -32,7 +32,7 @@ public class patient extends javax.swing.JFrame {
         initComponents();
         Connect();
         autoid();
-        pateint_table();
+        pateint_table();//
         
         Image icon = new ImageIcon(this.getClass().getResource("/logohms.png")).getImage();
         this.setIconImage(icon);
@@ -47,7 +47,7 @@ public class patient extends javax.swing.JFrame {
     public void Connect(){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost/sdmhospital","root","");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3307/sdmhospital","root","");
             
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(user.class.getName()).log(Level.SEVERE, null, ex);
@@ -223,8 +223,18 @@ public class patient extends javax.swing.JFrame {
         );
 
         jButton1.setText("update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("delete");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("add");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -234,6 +244,11 @@ public class patient extends javax.swing.JFrame {
         });
 
         jButton4.setText("exit");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -252,6 +267,11 @@ public class patient extends javax.swing.JFrame {
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+        });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
             }
         });
         jScrollPane2.setViewportView(jTable1);
@@ -359,6 +379,105 @@ public class patient extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(patient.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+    }                                        
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {                                     
+        //jtable update
+        
+        
+      DefaultTableModel d1 = (DefaultTableModel)jTable1.getModel();
+      int selectindex =jTable1.getSelectedRow();
+        
+        lblpno.setText(d1.getValueAt(selectindex, 0).toString());
+        txtpname.setText(d1.getValueAt(selectindex, 1).toString());
+        txtphone.setText(d1.getValueAt(selectindex, 2).toString());
+        txtaddress.setText(d1.getValueAt(selectindex, 3).toString());
+        
+        jButton3.setEnabled(false);
+        
+    }                                    
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        // update patient
+        
+         
+        String pname = txtpname.getText(); //arrage according to update query
+        String phone = txtphone.getText();
+        String address = txtaddress.getText();
+        String pno =lblpno.getText();
+        try {
+            
+            //update data into patient table 
+            pst = con.prepareStatement("update patient set name=?,phone=?,address=? where patientno=?");
+            
+            pst.setString(1, pname); //data which is hold by variables add on to the database
+            pst.setString(2, phone);
+            pst.setString(3, address);
+            pst.setString(4, pno);
+            pst.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "patient updated");
+            
+            autoid();
+            
+            //after insert information clear input fields
+            txtpname.setText("");
+            txtphone.setText("");
+            txtaddress.setText("");
+            
+            pateint_table();// to display data in side table
+            
+            jButton3.setEnabled(true);
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(patient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }                                        
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        // delete patient data
+        
+         
+     
+        String pno =lblpno.getText();//id needed
+        try {
+            
+            //delete data into patient table 
+            pst = con.prepareStatement("delete from patient where patientno = ?");
+            
+           
+            pst.setString(1, pno);
+            pst.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "patient deleted");
+            
+            autoid();
+            
+            //after insert information clear input fields
+            txtpname.setText("");
+            txtphone.setText("");
+            txtaddress.setText("");
+            
+            pateint_table();// to display data in side table
+            
+            jButton3.setEnabled(true);
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(patient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }                                        
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        // exit
+        
+        this.setVisible(false);
         
         
     }                                        
